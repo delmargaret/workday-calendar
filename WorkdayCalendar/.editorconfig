@@ -12,3 +12,9 @@ dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1633.severity = none
 dotnet_diagnostic.S1244.severity = none
 dotnet_diagnostic.S3260.severity = none
+
+[tests/**/*.cs]
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1611.severity = none
+dotnet_diagnostic.SA1615.severity = none
+dotnet_diagnostic.SA1618.severity = none
