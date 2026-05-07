@@ -1,0 +1,14 @@
+.git/
+.vs/
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+**/.vscode/
+**/TestResults/
+**/CoverageReport/
+artifacts/
+publish/
+*.user
+*.suo
+*.log

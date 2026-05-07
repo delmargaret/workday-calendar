@@ -103,7 +103,7 @@
 @code {
     private static readonly string[] WeekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     private static readonly string[] DateTimeInputFormats = ["yyyy-MM-ddTHH:mm", "yyyy-MM-ddTHH:mm:ss"];
-    private const string TimeInputFormat = "HH:mm";
+    private static readonly string[] TimeInputFormats = ["HH:mm", "HH:mm:ss"];
     private const string DateTimeDisplayFormat = "dd-MM-yyyy HH:mm";
     private const string MonthDisplayFormat = "MMMM yyyy";
     private const string SelectedDateDisplayFormat = "dddd, dd-MM-yyyy";
@@ -147,11 +147,11 @@
 
     private async Task LoadWorkdayCalendarAsync()
     {
-        var settings = await CalendarService.GetWorkdayCalendarAsync();
-        WorkdayStartText = settings.WorkdaySchedule.StartsAt.ToString(TimeInputFormat, CultureInfo.InvariantCulture);
-        WorkdayEndText = settings.WorkdaySchedule.StopsAt.ToString(TimeInputFormat, CultureInfo.InvariantCulture);
-        Holidays = settings.Holidays.ToHashSet();
-        RecurringHolidays = settings.RecurringHolidays.ToHashSet();
+        var config = await CalendarService.GetWorkdayCalendarAsync();
+        WorkdayStartText = config.WorkdaySchedule.StartsAt.ToString(TimeInputFormats[0], CultureInfo.InvariantCulture);
+        WorkdayEndText = config.WorkdaySchedule.StopsAt.ToString(TimeInputFormats[0], CultureInfo.InvariantCulture);
+        Holidays = config.Holidays.ToHashSet();
+        RecurringHolidays = config.RecurringHolidays.ToHashSet();
     }
 
     private async Task ToggleSelectedHolidayAsync()
@@ -188,8 +188,8 @@
         try
         {
             var workday = new WorkdaySchedule(
-                TimeOnly.ParseExact(WorkdayStartText, TimeInputFormat, CultureInfo.InvariantCulture),
-                TimeOnly.ParseExact(WorkdayEndText, TimeInputFormat, CultureInfo.InvariantCulture));
+                TimeOnly.ParseExact(WorkdayStartText, TimeInputFormats, CultureInfo.InvariantCulture),
+                TimeOnly.ParseExact(WorkdayEndText, TimeInputFormats, CultureInfo.InvariantCulture));
             await CalendarService.SetWorkdayScheduleAsync(workday);
             ErrorText = null;
             await LoadWorkdayCalendarAsync();
