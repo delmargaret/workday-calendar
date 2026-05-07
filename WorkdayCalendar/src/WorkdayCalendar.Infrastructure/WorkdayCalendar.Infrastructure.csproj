@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\WorkdayCalendar.Application\WorkdayCalendar.Application.csproj" />
+    <ProjectReference Include="..\WorkdayCalendar.Domain\WorkdayCalendar.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Json\calendar-settings.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
