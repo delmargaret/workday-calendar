@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkdayCalendar.Domain", "src\WorkdayCalendar.Domain\WorkdayCalendar.Domain.csproj", "{A07798D1-21BC-4BF8-954B-38FF525C17F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkdayCalendar.Application", "src\WorkdayCalendar.Application\WorkdayCalendar.Application.csproj", "{8242D472-4DF8-4109-A06B-D092A6B30059}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkdayCalendar.Infrastructure", "src\WorkdayCalendar.Infrastructure\WorkdayCalendar.Infrastructure.csproj", "{45AB93A2-3CB5-45F0-8892-AD86B7C48B9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkdayCalendar.Console", "src\WorkdayCalendar.Console\WorkdayCalendar.Console.csproj", "{02F4C03F-11F7-4E16-9837-8F69E920816B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkdayCalendar.Ui", "src\WorkdayCalendar.Ui\WorkdayCalendar.Ui.csproj", "{B293176E-1333-4E66-967E-246AA56D4D67}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A07798D1-21BC-4BF8-954B-38FF525C17F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A07798D1-21BC-4BF8-954B-38FF525C17F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A07798D1-21BC-4BF8-954B-38FF525C17F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A07798D1-21BC-4BF8-954B-38FF525C17F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8242D472-4DF8-4109-A06B-D092A6B30059}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8242D472-4DF8-4109-A06B-D092A6B30059}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8242D472-4DF8-4109-A06B-D092A6B30059}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8242D472-4DF8-4109-A06B-D092A6B30059}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45AB93A2-3CB5-45F0-8892-AD86B7C48B9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45AB93A2-3CB5-45F0-8892-AD86B7C48B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45AB93A2-3CB5-45F0-8892-AD86B7C48B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45AB93A2-3CB5-45F0-8892-AD86B7C48B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02F4C03F-11F7-4E16-9837-8F69E920816B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F4C03F-11F7-4E16-9837-8F69E920816B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02F4C03F-11F7-4E16-9837-8F69E920816B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02F4C03F-11F7-4E16-9837-8F69E920816B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B293176E-1333-4E66-967E-246AA56D4D67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B293176E-1333-4E66-967E-246AA56D4D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B293176E-1333-4E66-967E-246AA56D4D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B293176E-1333-4E66-967E-246AA56D4D67}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47B73474-EF12-43F4-96BB-FEF48941D4FF}
+	EndGlobalSection
+EndGlobal

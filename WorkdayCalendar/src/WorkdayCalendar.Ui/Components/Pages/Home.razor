@@ -1,0 +1,244 @@
+@page "/"
+@rendermode InteractiveServer
+@inject IWorkdayCalendarService CalendarService
+
+<PageTitle>Workday Calendar</PageTitle>
+
+<main class="shell">
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">Workday Calendar</p>
+            <h1>Calendar setup and workday calculator</h1>
+        </div>
+        <div class="summary">
+            <span>@Holidays.Count fixed holidays</span>
+            <span>@RecurringHolidays.Count recurring holidays</span>
+        </div>
+    </header>
+
+    <section class="workspace">
+        <div class="calendar-panel">
+            <div class="toolbar">
+                <button type="button" class="icon-button" title="Previous month" @onclick="PreviousMonth">&lt;</button>
+                <h2>@VisibleMonth.ToString(MonthDisplayFormat, CultureInfo.CurrentCulture)</h2>
+                <button type="button" class="icon-button" title="Next month" @onclick="NextMonth">&gt;</button>
+            </div>
+
+            <div class="weekday-row">
+                @foreach (var dayName in WeekdayNames)
+                {
+                    <span>@dayName</span>
+                }
+            </div>
+
+            <div class="month-grid">
+                @foreach (var date in CalendarDates)
+                {
+                    <button type="button" class="@GetDayClass(date)" @onclick="() => SelectDate(date)">
+                        <span>@date.Day</span>
+                        @if (IsRecurringHoliday(date))
+                        {
+                            <small>Recurring</small>
+                        }
+                        else if (Holidays.Contains(date))
+                        {
+                            <small>Holiday</small>
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+
+        <aside class="settings-panel">
+            <section class="panel-section">
+                <h2>Workday Hours</h2>
+                <div class="form-grid">
+                    <label>
+                        Workday start
+                        <input type="time" value="@WorkdayStartText" @onchange="SetWorkdayStart" />
+                    </label>
+                    <label>
+                        Workday end
+                        <input type="time" value="@WorkdayEndText" @onchange="SetWorkdayEnd" />
+                    </label>
+                </div>
+                <button type="button" class="primary-button" @onclick="ApplyWorkdayHoursAsync">Apply to all days</button>
+            </section>
+
+            <section class="panel-section">
+                <h2>Selected Day</h2>
+                <p class="selected-date">@SelectedDate.ToString(SelectedDateDisplayFormat, CultureInfo.CurrentCulture)</p>
+                <div class="button-row">
+                    <button type="button" @onclick="ToggleSelectedHolidayAsync">@SelectedHolidayButtonText</button>
+                    <button type="button" @onclick="ToggleSelectedRecurringHolidayAsync">@SelectedRecurringButtonText</button>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <h2>Calculate</h2>
+                <label>
+                    Start datetime
+                    <input type="datetime-local" value="@CalculationStartText" @onchange="SetCalculationStart" />
+                </label>
+                <label>
+                    Workdays
+                    <input type="number" step="0.000001" @bind="WorkdaysText" />
+                </label>
+                <button type="button" class="primary-button" @onclick="CalculateAsync">Calculate</button>
+
+                @if (!string.IsNullOrWhiteSpace(ResultText))
+                {
+                    <div class="result">@ResultText</div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(ErrorText))
+                {
+                    <div class="error">@ErrorText</div>
+                }
+            </section>
+        </aside>
+    </section>
+</main>
+
+@code {
+    private static readonly string[] WeekdayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    private static readonly string[] DateTimeInputFormats = ["yyyy-MM-ddTHH:mm", "yyyy-MM-ddTHH:mm:ss"];
+    private const string TimeInputFormat = "HH:mm";
+    private const string DateTimeDisplayFormat = "dd-MM-yyyy HH:mm";
+    private const string MonthDisplayFormat = "MMMM yyyy";
+    private const string SelectedDateDisplayFormat = "dddd, dd-MM-yyyy";
+
+    private DateOnly VisibleMonth { get; set; } = new(DateTime.Today.Year, DateTime.Today.Month, 1);
+    private DateOnly SelectedDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    private HashSet<DateOnly> Holidays { get; set; } = [];
+    private HashSet<RecurringHoliday> RecurringHolidays { get; set; } = [];
+
+    private string WorkdayStartText { get; set; } = "08:00";
+    private string WorkdayEndText { get; set; } = "16:00";
+    private string CalculationStartText { get; set; } = "2026-06-10T18:05";
+    private string WorkdaysText { get; set; } = "8.95";
+    private string? ResultText { get; set; }
+    private string? ErrorText { get; set; }
+
+    private IEnumerable<DateOnly> CalendarDates
+    {
+        get
+        {
+            var offset = (int)VisibleMonth.DayOfWeek;
+            var gridStart = VisibleMonth.AddDays(-offset);
+
+            for (var index = 0; index < 42; index++)
+            {
+                yield return gridStart.AddDays(index);
+            }
+        }
+    }
+
+    private string SelectedHolidayButtonText => Holidays.Contains(SelectedDate) ? "Remove holiday" : "Set holiday";
+
+    private string SelectedRecurringButtonText => IsRecurringHoliday(SelectedDate)
+        ? "Remove recurring holiday"
+        : "Set recurring holiday";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWorkdayCalendarAsync();
+    }
+
+    private async Task LoadWorkdayCalendarAsync()
+    {
+        var settings = await CalendarService.GetWorkdayCalendarAsync();
+        WorkdayStartText = settings.WorkdaySchedule.StartsAt.ToString(TimeInputFormat, CultureInfo.InvariantCulture);
+        WorkdayEndText = settings.WorkdaySchedule.StopsAt.ToString(TimeInputFormat, CultureInfo.InvariantCulture);
+        Holidays = settings.Holidays.ToHashSet();
+        RecurringHolidays = settings.RecurringHolidays.ToHashSet();
+    }
+
+    private async Task ToggleSelectedHolidayAsync()
+    {
+        if (Holidays.Contains(SelectedDate))
+        {
+            await CalendarService.RemoveHolidayAsync(SelectedDate);
+        }
+        else
+        {
+            await CalendarService.AddHolidayAsync(SelectedDate);
+        }
+
+        await LoadWorkdayCalendarAsync();
+    }
+
+    private async Task ToggleSelectedRecurringHolidayAsync()
+    {
+        var holiday = new RecurringHoliday(SelectedDate.Day, SelectedDate.Month);
+        if (RecurringHolidays.Contains(holiday))
+        {
+            await CalendarService.RemoveRecurringHolidayAsync(holiday);
+        }
+        else
+        {
+            await CalendarService.AddRecurringHolidayAsync(holiday);
+        }
+
+        await LoadWorkdayCalendarAsync();
+    }
+
+    private async Task ApplyWorkdayHoursAsync()
+    {
+        try
+        {
+            var workday = new WorkdaySchedule(
+                TimeOnly.ParseExact(WorkdayStartText, TimeInputFormat, CultureInfo.InvariantCulture),
+                TimeOnly.ParseExact(WorkdayEndText, TimeInputFormat, CultureInfo.InvariantCulture));
+            await CalendarService.SetWorkdayScheduleAsync(workday);
+            ErrorText = null;
+            await LoadWorkdayCalendarAsync();
+        }
+        catch (Exception exception)
+        {
+            ErrorText = exception.Message;
+        }
+    }
+
+    private async Task CalculateAsync()
+    {
+        try
+        {
+            var start = DateTime.ParseExact(CalculationStartText, DateTimeInputFormats, CultureInfo.InvariantCulture);
+            var workdaysToAdd = double.Parse(WorkdaysText, CultureInfo.InvariantCulture);
+            var result = await CalendarService.CalculateWorkdaysAsync(start, workdaysToAdd);
+            ResultText = result.ToString(DateTimeDisplayFormat, CultureInfo.InvariantCulture);
+            ErrorText = null;
+        }
+        catch (Exception exception)
+        {
+            ResultText = null;
+            ErrorText = exception.Message;
+        }
+    }
+
+    private void PreviousMonth() => VisibleMonth = VisibleMonth.AddMonths(-1);
+
+    private void NextMonth() => VisibleMonth = VisibleMonth.AddMonths(1);
+
+    private void SelectDate(DateOnly date) => SelectedDate = date;
+
+    private bool IsRecurringHoliday(DateOnly date) => RecurringHolidays.Contains(new RecurringHoliday(date.Day, date.Month));
+
+    private void SetWorkdayStart(ChangeEventArgs args) => WorkdayStartText = args.Value?.ToString() ?? string.Empty;
+
+    private void SetWorkdayEnd(ChangeEventArgs args) => WorkdayEndText = args.Value?.ToString() ?? string.Empty;
+
+    private void SetCalculationStart(ChangeEventArgs args) => CalculationStartText = args.Value?.ToString() ?? string.Empty;
+
+    private string GetDayClass(DateOnly date)
+    {
+        var classes = new List<string> { "day-cell" };
+
+        if (date.Month != VisibleMonth.Month) classes.Add("muted");
+        if (date == SelectedDate) classes.Add("selected");
+        if (date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday) classes.Add("weekend");
+        if (Holidays.Contains(date) || IsRecurringHoliday(date)) classes.Add("holiday");
+        return string.Join(" ", classes);
+    }
+}

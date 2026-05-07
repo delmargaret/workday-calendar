@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "WorkdayCalendar.Ui": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:42901;http://localhost:42902"
+    }
+  }
+}
